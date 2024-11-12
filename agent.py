@@ -154,7 +154,7 @@ for company_name, stock_symbol in companies.items():
 
     # Add task for Yahoo Finance data collection
     yahoo_finance_tasks.append(Task(
-        description=f"Fetch Yahoo Finance data for {company_name}, including stock price, P/E ratio, ROE, and recent news.",
+        description=f"Fetch Yahoo Finance data for {company_name}, including stock price, P/E ratio, ROE, and recent news. for the timeframe from {start_date} to {end_date}.",
         expected_output=(
             f"## {company_name} - Yahoo Finance Data\n"
             f"{formatted_data}\n\n"
@@ -191,7 +191,7 @@ for company_name, stock_symbol in companies.items():
     current_file_path = os.path.join(company_dir, "current_data_output.md")
     data_collection_tasks.append(Task(
         description=(
-            f"Collect latest stock price, quarterly earnings, P/E ratio, ROE, EPS, and recent news articles for {company_name}. Identify recent trends, HR changes, or acquisitions impacting the company's growth."
+            f"Collect latest stock price, quarterly earnings, P/E ratio, ROE, EPS, and recent news articles for {company_name} and date from {start_date} to {end_date}.. Identify recent trends, HR changes, or acquisitions impacting the company's growth."
         ),
         expected_output=(
             f"### {company_name} - Latest Financial Overview\n\n"
@@ -214,7 +214,7 @@ for company_name in companies.keys():
     company_dir = f"data/{company_name.lower()}"
     report_file_path = os.path.join(company_dir, "investment_report_output.md")
     report_tasks.append(Task(
-        description=f"Generate an investment report for {company_name} using historical and current data. Provide a recommendation based on recent trends.",
+        description=f"Generate an investment report for {company_name} using historical and current data (only between {start_date} to {end_date}). Provide a recommendation based on recent trends.",
         expected_output=(
             "A markdown report with a summary, sections for historical trends, current performance, and a 5-star recommendation."
         ),
