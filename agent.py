@@ -117,10 +117,10 @@ for company_name, stock_symbol in companies.items():
     # Historical data task (last two years)
     historical_file_path = os.path.join(company_dir, "historical_data_output.md")
     data_collection_tasks.append(Task(
-        description=f"Collect financial data for {company_name} from {start_date} to {end_date}, focusing on revenue, growth rate, and profitability.",
+        description=f"Collect detailed financial performance data for {company_name} from {start_date} to {end_date}. Focus on revenue, growth rate, profitability, and any notable strategic moves.",
         expected_output=(
-            f"A markdown report of {company_name}'s financial performance over the last two years, "
-            "covering annual and quarterly revenue, growth rate, and profitability trends."
+            f"Markdown report of {company_name}'s financial performance over the last two years, covering annual and quarterly revenue, "
+            "growth rates, profitability trends, acquisitions, and strategic shifts."
         ),
         output_file=historical_file_path,
         agent=historical_data_collector,
@@ -129,9 +129,12 @@ for company_name, stock_symbol in companies.items():
     # Current data task
     current_file_path = os.path.join(company_dir, "current_data_output.md")
     data_collection_tasks.append(Task(
-        description=f"Fetch the latest stock price, quarterly earnings, and key news articles for {company_name} from Yahoo Finance.",
+        description=(
+            f"Fetch the latest stock price, quarterly earnings, press releases, and important news articles for {company_name} from Yahoo Finance. "
+            "Identify recent trends, strategic moves, HR changes, or any issues impacting company growth."
+        ),
         expected_output=(
-            f"A markdown summary of {company_name}'s current stock price, most recent earnings report, and insights from two recent news articles."
+            f"Markdown summary of {company_name}'s current stock price, recent quarterly earnings, major news, and any strategic updates from recent press releases including the date."
         ),
         output_file=current_file_path,
         agent=current_data_collectors[company_name],
@@ -143,10 +146,10 @@ for company_name in companies.keys():
     company_dir = f"data/{company_name.lower()}"
     report_file_path = os.path.join(company_dir, "investment_report_output.md")
     report_tasks.append(Task(
-        description=f"Create an investment report for {company_name} with insights on historical and real-time data.",
+        description=f"Generate a comprehensive investment report for {company_name}, integrating both historical and current data.",
         expected_output=(
-            "A markdown report with an executive summary, sections for historical trends, recent performance, and a 5-star investment rating. "
-            "Include sections on revenue growth, market position, profitability, and current performance."
+            "A markdown report that includes a detailed executive summary, sections on historical trends and recent performance, strategic analysis of the company, "
+            "and a final investment recommendation with a 5-star rating. Also have a detailed report what are the main top 3 drivers for the current business in the future."
         ),
         output_file=report_file_path,
         agent=report_writer,
@@ -156,15 +159,23 @@ for company_name in companies.keys():
 comparison_output_file = "data/comparison_output.md"
 comparison_task = Task(
     description=(
-        "Using the collected data for all companies, generate a markdown table comparing revenue, growth rate, profitability, "
-        "and market share. Provide a strategic investment recommendation for each with a 5-star rating system."
+        "Using all collected data, create a detailed markdown table comparing revenue, growth rate, profitability, market share, and additional financial indicators. "
+        "Provide a strategic recommendation and rating for each company based on recent performance, historical trends, and current market position."
     ),
     expected_output=(
-        "A markdown table comparing each company's revenue, growth rate, profitability, and market share. Follow with a recommendation.\n\n"
-        "| Company       | Revenue (USD) | Growth Rate | Profitability | Market Share | Rating     |\n"
-        "|---------------|---------------|-------------|---------------|--------------|------------|\n"
-        "| IBM           | $75B          | 3.2%        | 12%           | 10%          | *****      |\n"
-        "| Infosys       | $15B          | 8.5%        | 15%           | 2%           | ****       |\n"
+        "A markdown table comparing key metrics for each company, followed by a summary recommendation and rating. Each rating reflects overall investment potential based on "
+        "financial stability, growth prospects, and market position.\n\n"
+        "| Company       | Revenue (USD) | Growth Rate | Profitability | Market Share | P/E Ratio | Debt-to-Equity | Dividend Yield | Rating     |\n"
+        "|---------------|---------------|-------------|---------------|--------------|-----------|----------------|----------------|------------|\n"
+        "| IBM           | $75B          | 3.2%        | 12%           | 10%          | 24.5      | 1.2            | 4.8%           | *****      |\n"
+        "| Infosys       | $15B          | 8.5%        | 15%           | 2%           | 28.1      | 0.3            | 1.5%           | ****       |\n"
+        "| Accenture     | $50B          | 6.0%        | 10%           | 7%           | 30.2      | 0.8            | 1.6%           | *****      |\n"
+        "| Google        | $180B         | 10.0%       | 20%           | 25%          | 35.0      | 0.1            | 0%             | *****      |\n\n"
+        "### Rating Explanation\n"
+        "- **★★★★★**: Strong buy – Excellent financial stability, growth potential, and market position.\n"
+        "- **★★★★**: Buy – Good investment potential, with strong financials and growth prospects.\n"
+        "- **★★★**: Hold – Moderate investment potential with average growth and profitability.\n\n"
+        "Each recommendation is based on historical and current performance data and strategic trends for each company."
     ),
     output_file=comparison_output_file,
     agent=report_writer,
