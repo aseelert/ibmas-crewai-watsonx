@@ -31,8 +31,8 @@ The code defines the following roles and agents:
 
 1. **Clone the Repository**:
    ```bash
-   git clone <repo-url>
-   cd <repo-directory>
+   git clone https://github.com/aseelert/ibmas-crewai-watsonx
+   cd ibmas-crewai-watsonx
    ```
 
 2. **Install Dependencies**:
