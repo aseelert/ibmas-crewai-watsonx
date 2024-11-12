@@ -118,9 +118,17 @@ for company_name, stock_symbol in companies.items():
     historical_file_path = os.path.join(company_dir, "historical_data_output.md")
     data_collection_tasks.append(Task(
         description=f"Collect detailed financial performance data for {company_name} from {start_date} to {end_date}. Focus on revenue, growth rate, profitability, and any notable strategic moves.",
+        description=f"Collect financial data for {company_name} from {start_date} to {end_date}, focusing on revenue, growth rate, and profitability.",
         expected_output=(
-            f"Markdown report of {company_name}'s financial performance over the last two years, covering annual and quarterly revenue, "
-            "growth rates, profitability trends, acquisitions, and strategic shifts."
+            f"A markdown report of {company_name}'s financial performance over the last two years, "
+            "covering annual and quarterly revenue, growth rate, and profitability trends.\n\n"
+            "Include the following table format for quarterly and annual revenue:\n\n"
+            "| Year | Quarter 1       | Quarter 2       | Quarter 3       | Quarter 4       | Annual         |\n"
+            "|------|-----------------|-----------------|-----------------|-----------------|----------------|\n"
+            "| 2022 | $18.1 billion   | $18.9 billion   | $19.2 billion   | $20.1 billion   | $76.3 billion  |\n"
+            "| 2023 | $19.5 billion   | $20.2 billion   | $20.5 billion   | $21.3 billion   | $81.5 billion  |\n"
+            "| 2024 | $20.8 billion   | $21.5 billion   | $21.8 billion   | $22.6 billion   | $86.7 billion  |\n\n"
+            "Provide an analysis section below the table that discusses revenue trends, seasonal variations, and annual growth."
         ),
         output_file=historical_file_path,
         agent=historical_data_collector,
@@ -129,12 +137,21 @@ for company_name, stock_symbol in companies.items():
     # Current data task
     current_file_path = os.path.join(company_dir, "current_data_output.md")
     data_collection_tasks.append(Task(
-        description=(
+       description=(
             f"Fetch the latest stock price, quarterly earnings, press releases, and important news articles for {company_name} from Yahoo Finance. "
             "Identify recent trends, strategic moves, HR changes, or any issues impacting company growth."
         ),
         expected_output=(
-            f"Markdown summary of {company_name}'s current stock price, recent quarterly earnings, major news, and any strategic updates from recent press releases including the date."
+            f"A markdown summary of {company_name}'s current stock performance, recent earnings, latest press releases, and key news articles, "
+            "formatted as follows:\n\n"
+            "### {company_name} - Latest Stock and News Report\n\n"
+            "| Date       | Information Type        | Details                                                                                           |\n"
+            "|------------|------------------------|---------------------------------------------------------------------------------------------------|\n"
+            "| 2023-09-15 | Stock Price             | **$2000**                                                                                        |\n"
+            "| 2023-09-15 | Quarterly Earnings      | Reported **$15 billion** net income, **$60 billion** revenue, with a growth rate of **20%**.     |\n"
+            "| 2023-09-10 | Press Release           | Announced acquisition of XYZ company to expand market reach in AI technology.                     |\n"
+            "| 2023-08-25 | News Article            | [Source: Financial Times] Discussed potential HR restructuring to improve operational efficiency. |\n\n"
+            "Ensure each entry is up-to-date, with dates listed for each record and links to sources when applicable."
         ),
         output_file=current_file_path,
         agent=current_data_collectors[company_name],
@@ -165,12 +182,12 @@ comparison_task = Task(
     expected_output=(
         "A markdown table comparing key metrics for each company, followed by a summary recommendation and rating. Each rating reflects overall investment potential based on "
         "financial stability, growth prospects, and market position.\n\n"
-        "| Company       | Revenue (USD) | Growth Rate | Profitability | Market Share | P/E Ratio | Debt-to-Equity | Dividend Yield | Rating     |\n"
-        "|---------------|---------------|-------------|---------------|--------------|-----------|----------------|----------------|------------|\n"
-        "| IBM           | $75B          | 3.2%        | 12%           | 10%          | 24.5      | 1.2            | 4.8%           | *****      |\n"
-        "| Infosys       | $15B          | 8.5%        | 15%           | 2%           | 28.1      | 0.3            | 1.5%           | ****       |\n"
-        "| Accenture     | $50B          | 6.0%        | 10%           | 7%           | 30.2      | 0.8            | 1.6%           | *****      |\n"
-        "| Google        | $180B         | 10.0%       | 20%           | 25%          | 35.0      | 0.1            | 0%             | *****      |\n\n"
+        "| Company       |Stock Price| Revenue (USD) | Growth Rate | Profitability | Market Share | P/E Ratio | Debt-to-Equity | Dividend Yield | Rating     |\n"
+        "|---------------|---------------|---------------|-------------|---------------|--------------|-----------|----------------|----------------|------------|\n"
+        "| IBM           |216 USD        | $75B          | 3.2%        | 12%           | 10%          | 24.5      | 1.2            | 4.8%           | *****      |\n"
+        "| Infosys       |35 USD         | $15B          | 8.5%        | 15%           | 2%           | 28.1      | 0.3            | 1.5%           | ****       |\n"
+        "| Accenture     |50 USD         | $50B          | 6.0%        | 10%           | 7%           | 30.2      | 0.8            | 1.6%           | *****      |\n"
+        "| Google        |500 USD        | $180B         | 10.0%       | 20%           | 25%          | 35.0      | 0.1            | 0%             | *****      |\n\n"
         "### Rating Explanation\n"
         "- **★★★★★**: Strong buy – Excellent financial stability, growth potential, and market position.\n"
         "- **★★★★**: Buy – Good investment potential, with strong financials and growth prospects.\n"
