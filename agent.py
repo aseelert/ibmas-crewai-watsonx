@@ -14,9 +14,16 @@ companies = {
     "Google_Alphabet": "GOOGL"
 }
 
-# Parameters for Watsonx LLM
-parameters = {"decoding_method": "sample", "max_new_tokens": 500, "temperature": 0.2}
+# Parameter sets for each agent type
+historical_params = {"decoding_method": "sample", "max_new_tokens": 1000, "temperature": 0.1}  # Structured and focused on facts
+current_params = {"decoding_method": "greedy", "max_new_tokens": 500, "temperature": 0.2}  # Low variation, focused on precision
+report_params = {"decoding_method": "sample", "max_new_tokens": 1500, "temperature": 0.7}  # More creative and expansive for summaries
+yahoo_params = {"decoding_method": "sample", "max_new_tokens": 1000, "temperature": 0.0}  # No variation, focused on precision
 
+# Dedicated models for each agent
+historical_data_model = "ibm/granite-3-8b-instruct"
+current_data_model = "meta-llama/llama-3-405b-instruct"
+report_generation_model = "mistralai/mistral-large"
 # Dedicated models for each agent
 historical_data_model = "ibm/granite-3-8b-instruct"
 current_data_model = "meta-llama/llama-3-405b-instruct"
@@ -31,7 +38,7 @@ start_date = datetime(datetime.now().year - 2, 1, 1).date()
 historical_data_llm = WatsonxLLM(
     model_id=historical_data_model,
     url="https://us-south.ml.cloud.ibm.com",
-    params=parameters,
+    params=historical_params,
     project_id=os.getenv("WATSONX_PROJECT_ID"),
     apikey=os.getenv("WATSONX_APIKEY")
 )
@@ -39,7 +46,7 @@ historical_data_llm = WatsonxLLM(
 current_data_llm = WatsonxLLM(
     model_id=current_data_model,
     url="https://us-south.ml.cloud.ibm.com",
-    params=parameters,
+    params=current_params,
     project_id=os.getenv("WATSONX_PROJECT_ID"),
     apikey=os.getenv("WATSONX_APIKEY")
 )
@@ -47,7 +54,7 @@ current_data_llm = WatsonxLLM(
 report_writer_llm = WatsonxLLM(
     model_id=report_generation_model,
     url="https://us-south.ml.cloud.ibm.com",
-    params=parameters,
+    params=report_params,
     project_id=os.getenv("WATSONX_PROJECT_ID"),
     apikey=os.getenv("WATSONX_APIKEY")
 )
@@ -55,7 +62,7 @@ report_writer_llm = WatsonxLLM(
 yahoo_finance_llm = WatsonxLLM(
     model_id=yahoo_finance_model,
     url="https://us-south.ml.cloud.ibm.com",
-    params=parameters,
+    params=yahoo_params,
     project_id=os.getenv("WATSONX_PROJECT_ID"),
     apikey=os.getenv("WATSONX_APIKEY")
 )
