@@ -108,6 +108,7 @@ report_writer = Agent(
     verbose=1,
 )
 
+
 # Define data collection tasks for each company
 data_collection_tasks = []
 for company_name, stock_symbol in companies.items():
@@ -117,8 +118,10 @@ for company_name, stock_symbol in companies.items():
     # Historical data task (last two years)
     historical_file_path = os.path.join(company_dir, "historical_data_output.md")
     data_collection_tasks.append(Task(
-        description=f"Collect detailed financial performance data for {company_name} from {start_date} to {end_date}. Focus on revenue, growth rate, profitability, and any notable strategic moves.",
-        description=f"Collect financial data for {company_name} from {start_date} to {end_date}, focusing on revenue, growth rate, and profitability.",
+        description=(
+            f"Collect detailed financial performance data for {company_name} from {start_date} to {end_date}. "
+            "Focus on revenue, growth rate, profitability, and any notable strategic moves."
+        ),
         expected_output=(
             f"A markdown report of {company_name}'s financial performance over the last two years, "
             "covering annual and quarterly revenue, growth rate, and profitability trends.\n\n"
@@ -137,7 +140,7 @@ for company_name, stock_symbol in companies.items():
     # Current data task
     current_file_path = os.path.join(company_dir, "current_data_output.md")
     data_collection_tasks.append(Task(
-       description=(
+        description=(
             f"Fetch the latest stock price, quarterly earnings, press releases, and important news articles for {company_name} from Yahoo Finance. "
             "Identify recent trends, strategic moves, HR changes, or any issues impacting company growth."
         ),
@@ -156,6 +159,7 @@ for company_name, stock_symbol in companies.items():
         output_file=current_file_path,
         agent=current_data_collectors[company_name],
     ))
+
 
 # Define report generation tasks for each company
 report_tasks = []
