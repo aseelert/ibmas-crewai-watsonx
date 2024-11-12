@@ -15,10 +15,10 @@ companies = {
 }
 
 # Parameter sets for each agent type
-historical_params = {"decoding_method": "sample", "max_new_tokens": 1000, "temperature": 0.1}  # Structured and focused on facts
-current_params = {"decoding_method": "greedy", "max_new_tokens": 500, "temperature": 0.2}  # Low variation, focused on precision
-report_params = {"decoding_method": "sample", "max_new_tokens": 1500, "temperature": 0.7}  # More creative and expansive for summaries
-yahoo_params = {"decoding_method": "sample", "max_new_tokens": 1000, "temperature": 0.0}  # No variation, focused on precision
+historical_params = {"decoding_method": "sample", "max_new_tokens": 2000, "temperature": 0.1}  # Structured and focused on facts
+current_params = {"decoding_method": "greedy", "max_new_tokens": 1500, "temperature": 0.2}  # Low variation, focused on precision
+report_params = {"decoding_method": "sample", "max_new_tokens": 3500, "temperature": 0.7}  # More creative and expansive for summaries
+yahoo_params = {"decoding_method": "sample", "max_new_tokens": 2000, "temperature": 0.0}  # No variation, focused on precision
 
 # Dedicated models for each agent
 historical_data_model = "ibm/granite-3-8b-instruct"
