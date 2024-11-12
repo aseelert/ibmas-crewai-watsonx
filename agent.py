@@ -4,6 +4,7 @@ from datetime import datetime
 from crewai import Crew, Task, Agent
 from crewai_tools import SerperDevTool, ScrapeWebsiteTool
 from langchain_ibm import WatsonxLLM
+import yfinance as yf  # For Yahoo Finance historical data retrieval
 
 # List of companies with Yahoo Finance stock symbols
 companies = {
@@ -20,6 +21,7 @@ parameters = {"decoding_method": "sample", "max_new_tokens": 500, "temperature":
 historical_data_model = "ibm/granite-3-8b-instruct"
 current_data_model = "meta-llama/llama-3-405b-instruct"
 report_generation_model = "mistralai/mistral-large"
+yahoo_finance_model = "ibm/granite-3-8b-instruct"
 
 # Date range (last two years)
 end_date = datetime.now().date()
@@ -50,6 +52,14 @@ report_writer_llm = WatsonxLLM(
     apikey=os.getenv("WATSONX_APIKEY")
 )
 
+yahoo_finance_llm = WatsonxLLM(
+    model_id=yahoo_finance_model,
+    url="https://us-south.ml.cloud.ibm.com",
+    params=parameters,
+    project_id=os.getenv("WATSONX_PROJECT_ID"),
+    apikey=os.getenv("WATSONX_APIKEY")
+)
+
 # Tool for online search and direct scraping from Yahoo Finance
 search_tool = SerperDevTool(api_key=os.getenv("SERPER_API_KEY"))
 
@@ -64,6 +74,17 @@ prepare_directory("data")
 for company_name in companies.keys():
     prepare_directory(f"data/{company_name.lower()}")
 
+# Agent for fetching Yahoo Finance data directly
+yahoo_finance_data_collector = Agent(
+    llm=yahoo_finance_llm,
+    role="Yahoo Finance Data Specialist",
+    goal="Fetch detailed stock metrics from Yahoo Finance, including stock price history, quarterly performance, P/E ratio, and recent press releases.",
+    backstory="A finance data specialist proficient in gathering structured data directly from Yahoo Finance.",
+    allow_delegation=False,
+    tools=[],  # No additional tools needed with yfinance integration
+    verbose=1,
+)
+
 # Historical data collection agent
 historical_data_collector = Agent(
     llm=historical_data_llm,
@@ -74,6 +95,20 @@ historical_data_collector = Agent(
     tools=[search_tool],
     verbose=1,
 )
+
+# Fetch historical data using yfinance library
+def fetch_yahoo_finance_data(symbol):
+    stock = yf.Ticker(symbol)
+    historical_data = stock.history(period="5y", interval="1mo")
+    return historical_data[['Open', 'High', 'Low', 'Close', 'Volume']]
+
+# Format historical data into markdown
+def format_yahoo_finance_data(historical_data):
+    formatted_data = "| Date       | Open      | High      | Low       | Close     | Volume     |\n"
+    formatted_data += "|------------|-----------|-----------|-----------|-----------|------------|\n"
+    for date, row in historical_data.iterrows():
+        formatted_data += f"| {date.date()} | ${row['Open']:.2f} | ${row['High']:.2f} | ${row['Low']:.2f} | ${row['Close']:.2f} | {int(row['Volume'])} |\n"
+    return formatted_data
 
 # Current data collection agents
 current_data_collectors = {}
@@ -98,6 +133,30 @@ report_writer = Agent(
     allow_delegation=False,
     verbose=1,
 )
+
+
+# Define Yahoo Finance Data Collection tasks for each company
+yahoo_finance_tasks = []
+for company_name, stock_symbol in companies.items():
+    company_dir = f"data/{company_name.lower()}"
+    yahoo_finance_file_path = os.path.join(company_dir, "yahoo_finance_data.md")
+
+    # Fetch and format data from Yahoo Finance
+    historical_data = fetch_yahoo_finance_data(stock_symbol)
+    formatted_data = format_yahoo_finance_data(historical_data)
+
+    # Add task for Yahoo Finance data collection
+    yahoo_finance_tasks.append(Task(
+        description=f"Fetch Yahoo Finance data for {company_name}, including stock price, P/E ratio, ROE, and recent news.",
+        expected_output=(
+            f"## {company_name} - Yahoo Finance Data\n"
+            f"{formatted_data}\n\n"
+            "### Analysis\n- Interpret stock trends, P/E ratio insights, and recent press releases.\n"
+        ),
+        output_file=yahoo_finance_file_path,
+        agent=yahoo_finance_data_collector,
+    ))
+
 
 # Define historical and current data collection tasks
 data_collection_tasks = []
@@ -167,8 +226,8 @@ comparison_task = Task(
 
 # Assemble and run tasks
 crew = Crew(
-    agents=[historical_data_collector] + list(current_data_collectors.values()) + [report_writer],
-    tasks=data_collection_tasks + report_tasks + [comparison_task],
+    agents=[yahoo_finance_data_collector] + [historical_data_collector] + list(current_data_collectors.values()) + [report_writer],
+    tasks=yahoo_finance_tasks + data_collection_tasks + report_tasks + [comparison_task],
     verbose=1
 )
 
